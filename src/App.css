@@ -1,0 +1,12 @@
+#root {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  padding: 120px 24px 160px 24px;
+}
+
+main {
+  max-width: 640px;
+  width: 100%;
+}
