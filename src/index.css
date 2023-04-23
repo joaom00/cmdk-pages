@@ -70,3 +70,11 @@ body {
   background-color: var(--app-bg);
   overflow-x: hidden;
 }
+
+button {
+  all: unset;
+}
+
+button:focus {
+  outline: 2px solid var(--gray7);
+}

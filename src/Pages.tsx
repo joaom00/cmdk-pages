@@ -18,13 +18,16 @@ type ProviderProps = {
 
 export const Pages = ({ children }: ProviderProps) => {
   const [pages, setPages] = React.useState<string[]>(["root"]);
+  const currentPage = pages[pages.length - 1];
 
   const handlePageChange = (page: string) => {
     return setPages([...pages, page]);
   };
 
   const handlePreviousPage = () => {
-    setPages((pages) => pages.slice(0, -1));
+    if (currentPage !== "root") {
+      setPages((pages) => pages.slice(0, -1));
+    }
   };
 
   const handleGoToPage = (page: string) => {
@@ -39,7 +42,7 @@ export const Pages = ({ children }: ProviderProps) => {
     <PageContext.Provider
       value={{
         pages,
-        currentPage: pages[pages.length - 1],
+        currentPage,
         onPagesChange: handlePageChange,
         onPreviousPage: handlePreviousPage,
         onPageChange: handleGoToPage,

@@ -1,62 +1,46 @@
 import React from "react";
 import { Command } from "cmdk";
-import "./App.css";
-import "./raycast.scss";
 import { Pages, usePages } from "./Pages";
 import { PageContent, usePageContent } from "./PagesContent";
-import { Breadcrumb, BreadcrumbPortal, BreadcrumbProvider } from "./Breadcrumb";
+import { Breadcrumb, Breadcrumbs, BreadcrumbProvider } from "./Breadcrumb";
+import "./App.css";
+import "./vercel.scss";
 
 function App() {
-  const ref = React.useRef<HTMLDivElement | null>(null);
-
-  function bounce() {
-    if (ref.current) {
-      ref.current.style.transform = "scale(0.96)";
-      setTimeout(() => {
-        if (ref.current) {
-          ref.current.style.transform = "";
-        }
-      }, 100);
-    }
-  }
-
   return (
     <main>
       <BreadcrumbProvider>
-        <Command
-          ref={ref}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") bounce();
-          }}
-        >
-          <Pages>
-            <BreadcrumbPortal />
-            <Command.Input autoFocus placeholder="What do you need?" />
+        <Pages>
+          <CommandMenu>
+            <Breadcrumbs />
+            <CommandInput autoFocus placeholder="What do you need?" />
             <Command.List>
               <Command.Empty>No results found.</Command.Empty>
               <Breadcrumb>Home</Breadcrumb>
 
               <Group heading="Projects">
-                <ItemPageTrigger page="projects" shortcut="S P">
+                <PageItem page="projects" shortcut="S P">
                   <ProjectsIcon />
                   Search Projects...
-                </ItemPageTrigger>
+                </PageItem>
 
                 <Item>
                   <PlusIcon />
                   Create New Project...
                 </Item>
               </Group>
+
               <Group heading="Teams">
-                <Item shortcut="⇧ P">
+                <PageItem page="teams" shortcut="⇧ P">
                   <TeamsIcon />
                   Search Teams...
-                </Item>
+                </PageItem>
                 <Item>
                   <PlusIcon />
                   Create New Team...
                 </Item>
               </Group>
+
               <Group heading="Help">
                 <Item shortcut="⇧ D">
                   <DocsIcon />
@@ -81,13 +65,74 @@ function App() {
                 <Item>Project 5</Item>
                 <Item>Project 6</Item>
               </PageContent>
+
+              <PageContent page="teams">
+                <Breadcrumb>Teams</Breadcrumb>
+                <Item>Team 1</Item>
+                <Item>Team 2</Item>
+                <Item>Team 3</Item>
+                <Item>Team 4</Item>
+                <Item>Team 5</Item>
+                <Item>Team 6</Item>
+              </PageContent>
             </Command.List>
-          </Pages>
-        </Command>
+          </CommandMenu>
+        </Pages>
       </BreadcrumbProvider>
     </main>
   );
 }
+
+const CommandInput = (props: any) => {
+  const pagesContext = usePages();
+  return (
+    <Command.Input
+      {...props}
+      onKeyDown={(event) => {
+        if (
+          pagesContext.currentPage !== "root" &&
+          !!event.currentTarget.value
+        ) {
+          event.stopPropagation();
+        }
+      }}
+    />
+  );
+};
+
+const CommandMenu = (props: any) => {
+  const pagesContext = usePages();
+  const ref = React.useRef<HTMLDivElement | null>(null);
+
+  function bounce() {
+    if (ref.current) {
+      ref.current.style.transform = "scale(0.96)";
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.style.transform = "";
+        }
+      }, 100);
+    }
+  }
+
+  return (
+    <Command
+      {...props}
+      ref={ref}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") bounce();
+
+        if (pagesContext.currentPage === "root") return;
+
+        if (event.key === "Backspace") {
+          event.preventDefault();
+          pagesContext.onPreviousPage();
+          bounce();
+        }
+      }}
+    />
+  );
+};
 
 type ItemProps = React.ComponentPropsWithRef<typeof Command.Item> & {
   shortcut?: string;
@@ -125,10 +170,10 @@ function Group({ children, ...props }: GroupProps) {
   ) : null;
 }
 
-type PageTriggerProps = ItemProps & {
+type PageItemProps = ItemProps & {
   page: string;
 };
-const ItemPageTrigger = ({ page, ...props }: PageTriggerProps) => {
+const PageItem = ({ page, ...props }: PageItemProps) => {
   const context = usePages();
   return (
     <Item
@@ -198,24 +243,6 @@ function TeamsIcon() {
       <circle cx="9" cy="7" r="4"></circle>
       <path d="M23 21v-2a4 4 0 00-3-3.87"></path>
       <path d="M16 3.13a4 4 0 010 7.75"></path>
-    </svg>
-  );
-}
-
-function CopyIcon() {
-  return (
-    <svg
-      fill="none"
-      height="24"
-      shapeRendering="geometricPrecision"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      viewBox="0 0 24 24"
-      width="24"
-    >
-      <path d="M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866m-6 .17h8c1.105 0 2 .91 2 2.035v10.857C20 21.09 19.105 22 18 22h-8c-1.105 0-2-.911-2-2.036V9.107c0-1.124.895-2.036 2-2.036z"></path>
     </svg>
   );
 }

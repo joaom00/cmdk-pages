@@ -31,7 +31,7 @@ const BreadcrumbProvider = ({ children }: BreadcrumbProviderProps) => {
   );
 };
 
-const BreadcrumbPortal = () => {
+const Breadcrumbs = () => {
   const [, setPortalNode] = useBreadcrumbContext();
   return (
     <nav aria-label="Breadcrumb">
@@ -49,16 +49,18 @@ const Breadcrumb = ({ children, ...props }: BreadcrumbProps) => {
   const page = usePageContent();
   return pageContext.pages.includes(page) && portalNode
     ? ReactDOM.createPortal(
-        <li
-          cmdk-vercel-badge=""
-          onClick={() => pageContext.onPageChange(page)}
-          {...props}
-        >
-          {children}
+        <li style={{ all: "unset" }}>
+          <button
+            cmdk-vercel-badge=""
+            {...props}
+            onClick={() => pageContext.onPageChange(page)}
+          >
+            {children}
+          </button>
         </li>,
         portalNode
       )
     : null;
 };
 
-export { BreadcrumbProvider, BreadcrumbPortal, Breadcrumb };
+export { BreadcrumbProvider, Breadcrumbs, Breadcrumb };
