@@ -3,11 +3,8 @@ import ReactDOM from "react-dom";
 import { usePages } from "./Pages";
 import { usePageContent } from "./PagesContent";
 
-type BreadcrumbElement = HTMLOListElement;
-type ContextValue = [
-  BreadcrumbElement | null,
-  (element: BreadcrumbElement | null) => void
-];
+type BreadcrumbElement = HTMLOListElement | null;
+type ContextValue = [BreadcrumbElement, (element: BreadcrumbElement) => void];
 
 const Context = React.createContext<ContextValue | undefined>(undefined);
 

@@ -3,7 +3,7 @@ import React from "react";
 type PageContextValue = {
   pages: string[];
   currentPage: string;
-  onPagesChange: (page: string) => void;
+  onNextPage: (page: string) => void;
   onPreviousPage: () => void;
   onPageChange: (page: string) => void;
 };
@@ -20,37 +20,36 @@ export const Pages = ({ children }: ProviderProps) => {
   const [pages, setPages] = React.useState<string[]>(["root"]);
   const currentPage = pages[pages.length - 1];
 
-  const handlePageChange = (page: string) => {
+  const handleNextPage = React.useCallback((page: string) => {
     return setPages([...pages, page]);
-  };
+  }, []);
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = React.useCallback(() => {
     if (currentPage !== "root") {
       setPages((pages) => pages.slice(0, -1));
     }
-  };
+  }, [currentPage]);
 
-  const handleGoToPage = (page: string) => {
+  const handlePageChange = React.useCallback((page: string) => {
     setPages((pages) => {
       const newPages = [...pages];
       newPages.splice(pages.indexOf(page) + 1, pages.length);
       return newPages;
     });
-  };
+  }, []);
 
-  return (
-    <PageContext.Provider
-      value={{
-        pages,
-        currentPage,
-        onPagesChange: handlePageChange,
-        onPreviousPage: handlePreviousPage,
-        onPageChange: handleGoToPage,
-      }}
-    >
-      {children}
-    </PageContext.Provider>
+  const value = React.useMemo(
+    () => ({
+      pages,
+      currentPage,
+      onNextPage: handleNextPage,
+      onPreviousPage: handlePreviousPage,
+      onPageChange: handlePageChange,
+    }),
+    [pages, currentPage, handleNextPage, handlePreviousPage, handlePageChange]
   );
+
+  return <PageContext.Provider value={value}>{children}</PageContext.Provider>;
 };
 
 export const usePages = () => {

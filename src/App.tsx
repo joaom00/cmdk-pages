@@ -19,10 +19,10 @@ function App() {
               <Breadcrumb>Home</Breadcrumb>
 
               <Group heading="Projects">
-                <PageItem page="projects" shortcut="S P">
+                <PageItemTrigger page="projects" shortcut="S P">
                   <ProjectsIcon />
                   Search Projects...
-                </PageItem>
+                </PageItemTrigger>
 
                 <Item>
                   <PlusIcon />
@@ -31,10 +31,10 @@ function App() {
               </Group>
 
               <Group heading="Teams">
-                <PageItem page="teams" shortcut="⇧ P">
+                <PageItemTrigger page="teams" shortcut="⇧ P">
                   <TeamsIcon />
                   Search Teams...
-                </PageItem>
+                </PageItemTrigger>
                 <Item>
                   <PlusIcon />
                   Create New Team...
@@ -83,7 +83,9 @@ function App() {
   );
 }
 
-const CommandInput = (props: any) => {
+interface CommandInputProps
+  extends React.ComponentPropsWithoutRef<typeof Command.Input> {}
+const CommandInput = (props: CommandInputProps) => {
   const pagesContext = usePages();
   return (
     <Command.Input
@@ -100,7 +102,8 @@ const CommandInput = (props: any) => {
   );
 };
 
-const CommandMenu = (props: any) => {
+interface CommandProps extends React.ComponentPropsWithoutRef<typeof Command> {}
+const CommandMenu = (props: CommandProps) => {
   const pagesContext = usePages();
   const ref = React.useRef<HTMLDivElement | null>(null);
 
@@ -134,11 +137,10 @@ const CommandMenu = (props: any) => {
   );
 };
 
-type ItemProps = React.ComponentPropsWithRef<typeof Command.Item> & {
+interface ItemProps extends React.ComponentPropsWithRef<typeof Command.Item> {
   shortcut?: string;
-  isCommand?: boolean;
-};
-function Item({ children, shortcut, isCommand = false, ...props }: ItemProps) {
+}
+function Item({ children, shortcut, ...props }: ItemProps) {
   const context = usePages();
   const page = usePageContent();
   const currentPageIndex = context.pages.indexOf(context.currentPage);
@@ -158,29 +160,28 @@ function Item({ children, shortcut, isCommand = false, ...props }: ItemProps) {
   ) : null;
 }
 
-type GroupProps = React.ComponentPropsWithRef<typeof Command.Group> & {};
-function Group({ children, ...props }: GroupProps) {
+interface GroupProps
+  extends React.ComponentPropsWithRef<typeof Command.Group> {}
+const Group = (props: GroupProps) => {
   const context = usePages();
   const page = usePageContent();
   const currentPageIndex = context.pages.indexOf(context.currentPage);
   const pageIndex = context.pages.indexOf(page);
   const shouldShow = currentPageIndex === pageIndex;
-  return shouldShow ? (
-    <Command.Group {...props}>{children}</Command.Group>
-  ) : null;
-}
-
-type PageItemProps = ItemProps & {
-  page: string;
+  return shouldShow ? <Command.Group {...props} /> : null;
 };
-const PageItem = ({ page, ...props }: PageItemProps) => {
+
+interface PageItemTriggerProps extends ItemProps {
+  page: string;
+}
+const PageItemTrigger = ({ page, ...props }: PageItemTriggerProps) => {
   const context = usePages();
   return (
     <Item
       {...props}
       onSelect={(value) => {
         props.onSelect?.(value);
-        context.onPagesChange(page);
+        context.onNextPage(page);
       }}
     />
   );
