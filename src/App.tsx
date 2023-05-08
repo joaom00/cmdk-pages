@@ -64,6 +64,7 @@ function App() {
                 <Item>Project 4</Item>
                 <Item>Project 5</Item>
                 <Item>Project 6</Item>
+                <PageItemTrigger page='projects-nest'>Nested page</PageItemTrigger>
               </PageContent>
 
               <PageContent page="teams">
@@ -75,6 +76,16 @@ function App() {
                 <Item>Team 5</Item>
                 <Item>Team 6</Item>
               </PageContent>
+
+              <PageContent page="projects-nest">
+                <Breadcrumb>Projects Nest</Breadcrumb>
+                <Item>Project Nest 1</Item>
+                <Item>Project Nest 2</Item>
+                <Item>Project Nest 3</Item>
+                <Item>Project Nest 4</Item>
+                <Item>Project Nest 5</Item>
+                <Item>Project Nest 6</Item>
+              </PageContent>
             </Command.List>
           </CommandMenu>
         </Pages>
@@ -84,7 +95,7 @@ function App() {
 }
 
 interface CommandInputProps
-  extends React.ComponentPropsWithoutRef<typeof Command.Input> {}
+  extends React.ComponentPropsWithoutRef<typeof Command.Input> { }
 const CommandInput = (props: CommandInputProps) => {
   const pagesContext = usePages();
   return (
@@ -102,7 +113,7 @@ const CommandInput = (props: CommandInputProps) => {
   );
 };
 
-interface CommandProps extends React.ComponentPropsWithoutRef<typeof Command> {}
+interface CommandProps extends React.ComponentPropsWithoutRef<typeof Command> { }
 const CommandMenu = (props: CommandProps) => {
   const pagesContext = usePages();
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -137,17 +148,17 @@ const CommandMenu = (props: CommandProps) => {
   );
 };
 
-interface ItemProps extends React.ComponentPropsWithRef<typeof Command.Item> {
+type ItemElement = React.ElementRef<typeof Command.Item>
+interface ItemProps extends React.ComponentPropsWithoutRef<typeof Command.Item> {
   shortcut?: string;
 }
-function Item({ children, shortcut, ...props }: ItemProps) {
+const Item = React.forwardRef<ItemElement, ItemProps>((props, forwardedRef) => {
+  const { children, shortcut, ...itemProps } = props
   const context = usePages();
   const page = usePageContent();
-  const currentPageIndex = context.pages.indexOf(context.currentPage);
-  const pageIndex = context.pages.indexOf(page);
-  const shouldShow = currentPageIndex === pageIndex;
+  const shouldShow = context.currentPage === page;
   return shouldShow ? (
-    <Command.Item {...props}>
+    <Command.Item {...itemProps} ref={forwardedRef}>
       {children}
       {shortcut && (
         <div cmdk-vercel-shortcuts="">
@@ -158,34 +169,37 @@ function Item({ children, shortcut, ...props }: ItemProps) {
       )}
     </Command.Item>
   ) : null;
-}
+})
 
+type GroupElement = React.ComponentRef<typeof Command.Group>
 interface GroupProps
-  extends React.ComponentPropsWithRef<typeof Command.Group> {}
-const Group = (props: GroupProps) => {
+  extends React.ComponentPropsWithoutRef<typeof Command.Group> { }
+const Group = React.forwardRef<GroupElement, GroupProps>((props, forwardedRef) => {
   const context = usePages();
   const page = usePageContent();
-  const currentPageIndex = context.pages.indexOf(context.currentPage);
-  const pageIndex = context.pages.indexOf(page);
-  const shouldShow = currentPageIndex === pageIndex;
-  return shouldShow ? <Command.Group {...props} /> : null;
-};
+  const shouldShow = context.currentPage === page;
+  return shouldShow ? <Command.Group {...props} ref={forwardedRef} /> : null;
+});
 
+
+type PageItemTriggerELement = React.ElementRef<typeof Item>
 interface PageItemTriggerProps extends ItemProps {
   page: string;
 }
-const PageItemTrigger = ({ page, ...props }: PageItemTriggerProps) => {
+const PageItemTrigger = React.forwardRef<PageItemTriggerELement, PageItemTriggerProps>((props, forwardedRef) => {
+  const { page, ...itemProps } = props
   const context = usePages();
   return (
     <Item
-      {...props}
+      {...itemProps}
+      ref={forwardedRef}
       onSelect={(value) => {
         props.onSelect?.(value);
         context.onNextPage(page);
       }}
     />
   );
-};
+});
 
 function ProjectsIcon() {
   return (

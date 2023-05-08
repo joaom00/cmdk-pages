@@ -21,12 +21,12 @@ export const Pages = ({ children }: ProviderProps) => {
   const currentPage = pages[pages.length - 1];
 
   const handleNextPage = React.useCallback((page: string) => {
-    return setPages([...pages, page]);
+    return setPages((currentPages) => [...currentPages, page]);
   }, []);
 
   const handlePreviousPage = React.useCallback(() => {
     if (currentPage !== "root") {
-      setPages((pages) => pages.slice(0, -1));
+      setPages((currentPages) => currentPages.slice(0, -1));
     }
   }, [currentPage]);
 
