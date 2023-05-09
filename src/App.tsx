@@ -58,13 +58,25 @@ function App() {
 
               <PageContent page="projects">
                 <Breadcrumb>Projects</Breadcrumb>
+                <PageItemTrigger page="inner-projects">
+                  Nested page...
+                </PageItemTrigger>
                 <Item>Project 1</Item>
                 <Item>Project 2</Item>
                 <Item>Project 3</Item>
                 <Item>Project 4</Item>
                 <Item>Project 5</Item>
                 <Item>Project 6</Item>
-                <PageItemTrigger page='projects-nest'>Nested page</PageItemTrigger>
+              </PageContent>
+
+              <PageContent page="inner-projects">
+                <Breadcrumb>Inner Projects</Breadcrumb>
+                <Item>Inner Project 1</Item>
+                <Item>Inner Project 2</Item>
+                <Item>Inner Project 3</Item>
+                <Item>Inner Project 4</Item>
+                <Item>Inner Project 5</Item>
+                <Item>Inner Project 6</Item>
               </PageContent>
 
               <PageContent page="teams">
@@ -76,16 +88,6 @@ function App() {
                 <Item>Team 5</Item>
                 <Item>Team 6</Item>
               </PageContent>
-
-              <PageContent page="projects-nest">
-                <Breadcrumb>Projects Nest</Breadcrumb>
-                <Item>Project Nest 1</Item>
-                <Item>Project Nest 2</Item>
-                <Item>Project Nest 3</Item>
-                <Item>Project Nest 4</Item>
-                <Item>Project Nest 5</Item>
-                <Item>Project Nest 6</Item>
-              </PageContent>
             </Command.List>
           </CommandMenu>
         </Pages>
@@ -95,7 +97,7 @@ function App() {
 }
 
 interface CommandInputProps
-  extends React.ComponentPropsWithoutRef<typeof Command.Input> { }
+  extends React.ComponentPropsWithoutRef<typeof Command.Input> {}
 const CommandInput = (props: CommandInputProps) => {
   const pagesContext = usePages();
   return (
@@ -113,7 +115,7 @@ const CommandInput = (props: CommandInputProps) => {
   );
 };
 
-interface CommandProps extends React.ComponentPropsWithoutRef<typeof Command> { }
+interface CommandProps extends React.ComponentPropsWithoutRef<typeof Command> {}
 const CommandMenu = (props: CommandProps) => {
   const pagesContext = usePages();
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -148,12 +150,13 @@ const CommandMenu = (props: CommandProps) => {
   );
 };
 
-type ItemElement = React.ElementRef<typeof Command.Item>
-interface ItemProps extends React.ComponentPropsWithoutRef<typeof Command.Item> {
+type ItemElement = React.ElementRef<typeof Command.Item>;
+interface ItemProps
+  extends React.ComponentPropsWithoutRef<typeof Command.Item> {
   shortcut?: string;
 }
 const Item = React.forwardRef<ItemElement, ItemProps>((props, forwardedRef) => {
-  const { children, shortcut, ...itemProps } = props
+  const { children, shortcut, ...itemProps } = props;
   const context = usePages();
   const page = usePageContent();
   const shouldShow = context.currentPage === page;
@@ -169,25 +172,29 @@ const Item = React.forwardRef<ItemElement, ItemProps>((props, forwardedRef) => {
       )}
     </Command.Item>
   ) : null;
-})
-
-type GroupElement = React.ComponentRef<typeof Command.Group>
-interface GroupProps
-  extends React.ComponentPropsWithoutRef<typeof Command.Group> { }
-const Group = React.forwardRef<GroupElement, GroupProps>((props, forwardedRef) => {
-  const context = usePages();
-  const page = usePageContent();
-  const shouldShow = context.currentPage === page;
-  return shouldShow ? <Command.Group {...props} ref={forwardedRef} /> : null;
 });
 
+type GroupElement = React.ComponentRef<typeof Command.Group>;
+interface GroupProps
+  extends React.ComponentPropsWithoutRef<typeof Command.Group> {}
+const Group = React.forwardRef<GroupElement, GroupProps>(
+  (props, forwardedRef) => {
+    const context = usePages();
+    const page = usePageContent();
+    const shouldShow = context.currentPage === page;
+    return shouldShow ? <Command.Group {...props} ref={forwardedRef} /> : null;
+  }
+);
 
-type PageItemTriggerELement = React.ElementRef<typeof Item>
+type PageItemTriggerELement = React.ElementRef<typeof Item>;
 interface PageItemTriggerProps extends ItemProps {
   page: string;
 }
-const PageItemTrigger = React.forwardRef<PageItemTriggerELement, PageItemTriggerProps>((props, forwardedRef) => {
-  const { page, ...itemProps } = props
+const PageItemTrigger = React.forwardRef<
+  PageItemTriggerELement,
+  PageItemTriggerProps
+>((props, forwardedRef) => {
+  const { page, ...itemProps } = props;
   const context = usePages();
   return (
     <Item
