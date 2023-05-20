@@ -2,21 +2,21 @@ import React from "react";
 import { Command } from "cmdk";
 import { Pages, usePages } from "./Pages";
 import { PageContent, usePageContent } from "./PagesContent";
-import { Breadcrumb, Breadcrumbs, BreadcrumbProvider } from "./Breadcrumb";
+import { Breadcrumbs } from "./Breadcrumb";
 import "./App.css";
 import "./vercel.scss";
 
 function App() {
   return (
     <main>
-      <BreadcrumbProvider>
-        <Pages>
-          <CommandMenu>
-            <Breadcrumbs />
+      <Pages>
+        <CommandMenu>
+          <Breadcrumbs>
+            <Breadcrumbs.Viewport />
             <CommandInput autoFocus placeholder="What do you need?" />
             <Command.List>
               <Command.Empty>No results found.</Command.Empty>
-              <Breadcrumb>Home</Breadcrumb>
+              <Breadcrumbs.Item>Home</Breadcrumbs.Item>
 
               <Group heading="Projects">
                 <PageItemTrigger page="projects" shortcut="S P">
@@ -57,7 +57,7 @@ function App() {
               </Group>
 
               <PageContent page="projects">
-                <Breadcrumb>Projects</Breadcrumb>
+                <Breadcrumbs.Item>Projects</Breadcrumbs.Item>
                 <PageItemTrigger page="inner-projects">
                   Nested page...
                 </PageItemTrigger>
@@ -70,7 +70,7 @@ function App() {
               </PageContent>
 
               <PageContent page="inner-projects">
-                <Breadcrumb>Inner Projects</Breadcrumb>
+                <Breadcrumbs.Item>Inner Projects</Breadcrumbs.Item>
                 <Item>Inner Project 1</Item>
                 <Item>Inner Project 2</Item>
                 <Item>Inner Project 3</Item>
@@ -80,7 +80,7 @@ function App() {
               </PageContent>
 
               <PageContent page="teams">
-                <Breadcrumb>Teams</Breadcrumb>
+                <Breadcrumbs.Item>Teams</Breadcrumbs.Item>
                 <Item>Team 1</Item>
                 <Item>Team 2</Item>
                 <Item>Team 3</Item>
@@ -89,15 +89,15 @@ function App() {
                 <Item>Team 6</Item>
               </PageContent>
             </Command.List>
-          </CommandMenu>
-        </Pages>
-      </BreadcrumbProvider>
+          </Breadcrumbs>
+        </CommandMenu>
+      </Pages>
     </main>
   );
 }
 
 interface CommandInputProps
-  extends React.ComponentPropsWithoutRef<typeof Command.Input> {}
+  extends React.ComponentPropsWithoutRef<typeof Command.Input> { }
 const CommandInput = (props: CommandInputProps) => {
   const pagesContext = usePages();
   return (
@@ -115,7 +115,7 @@ const CommandInput = (props: CommandInputProps) => {
   );
 };
 
-interface CommandProps extends React.ComponentPropsWithoutRef<typeof Command> {}
+interface CommandProps extends React.ComponentPropsWithoutRef<typeof Command> { }
 const CommandMenu = (props: CommandProps) => {
   const pagesContext = usePages();
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -176,7 +176,7 @@ const Item = React.forwardRef<ItemElement, ItemProps>((props, forwardedRef) => {
 
 type GroupElement = React.ComponentRef<typeof Command.Group>;
 interface GroupProps
-  extends React.ComponentPropsWithoutRef<typeof Command.Group> {}
+  extends React.ComponentPropsWithoutRef<typeof Command.Group> { }
 const Group = React.forwardRef<GroupElement, GroupProps>(
   (props, forwardedRef) => {
     const context = usePages();
